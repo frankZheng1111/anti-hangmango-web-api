@@ -12,10 +12,11 @@ import (
 const PROJECT_NAME string = "anti-hangmango-web-api"
 
 type JSONConfig struct {
-	ENV       string
-	UserCount int16
-	ApiUrl    string
-	Hangman   Hangman
+	ENV          string
+	UserCount    int16
+	HangmanCount int16
+	ApiUrl       string
+	Hangman      Hangman
 }
 
 type Server struct {
