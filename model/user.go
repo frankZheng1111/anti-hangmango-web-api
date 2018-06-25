@@ -2,9 +2,7 @@ package model
 
 import (
 	"anti-hangmango-web-api/api"
-	"anti-hangmango-web-api/config"
 	"log"
-	"strconv"
 )
 
 type User struct {
@@ -33,12 +31,7 @@ func (user *User) SignUp() error {
 }
 
 func BestUsers(page int64, pageSize int64) error {
-	pageStr := strconv.FormatInt(page, 2)
-	pageSizeStr := strconv.FormatInt(pageSize, 10)
-	res, err := api.Get(config.Config.ApiUrl+"/v1/users/best-users", map[string]string{
-		"page":     pageStr,
-		"pageSize": pageSizeStr,
-	})
+	res, err := api.GetBestUsers(page, pageSize)
 	resBodyJson, err := res.ParseBodyToJSON()
 	defer res.Body.Close()
 	log.Printf("Request Response: code: %d, body: %v\n", res.StatusCode, string(resBodyJson))
