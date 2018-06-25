@@ -6,8 +6,11 @@ import (
 )
 
 func main() {
+	model.BestUsers(1, 30)
 	user := model.NewUser("test1111", "1111")
 	err := user.SignUp()
-	log.Fatalln(err)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	log.Println("success")
 }
