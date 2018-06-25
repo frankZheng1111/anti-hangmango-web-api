@@ -25,10 +25,7 @@ func NewUser(loginName string, password string) *User {
 }
 
 func (user *User) SignUp() error {
-	res, err := api.Post(config.Config.ApiUrl+"/v1/users", map[string]interface{}{
-		"login_name": "test1111",
-		"password":   "test1111",
-	})
+	res, err := api.UserSignUp("test1111", "12")
 	resBodyJson, err := res.ParseBodyToJSON()
 	defer res.Body.Close()
 	log.Printf("Request Response: code: %d, body: %v\n", res.StatusCode, string(resBodyJson))
