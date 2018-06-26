@@ -13,8 +13,8 @@ const PROJECT_NAME string = "anti-hangmango-web-api"
 
 type JSONConfig struct {
 	ENV          string
-	UserCount    int16
-	HangmanCount int16
+	UserCount    int
+	HangmanCount int
 	APIUrl       string
 	Hangman      Hangman
 }
