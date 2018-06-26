@@ -15,7 +15,7 @@ type JSONConfig struct {
 	ENV          string
 	UserCount    int16
 	HangmanCount int16
-	ApiUrl       string
+	APIUrl       string
 	Hangman      Hangman
 }
 
