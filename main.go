@@ -1,14 +1,9 @@
 package main
 
 import (
-	"anti-hangmango-web-api/model"
-	"log"
+	"anti-hangmango-web-api/game"
 )
 
 func main() {
-	user, err := model.NewUser("test1111", "1111")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Println("success, user: ", user)
+	game.Start()
 }
