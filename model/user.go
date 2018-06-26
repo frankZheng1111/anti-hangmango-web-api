@@ -8,8 +8,8 @@ import (
 type User struct {
 	LoginName string
 	Password  string
-	authToken string
-	expiredAt int64
+	AuthToken string
+	ExpiredAt int64
 }
 
 func NewUser(loginName string, password string) (*User, error) {
@@ -42,8 +42,8 @@ func (user *User) SignIn() error {
 	}
 	defer res.Body.Close()
 	resBodyMap, _ := res.ParseBodyToMap()
-	user.authToken = resBodyMap["token"].(string)
-	user.expiredAt = int64(resBodyMap["expired_at"].(float64))
+	user.AuthToken = resBodyMap["token"].(string)
+	user.ExpiredAt = int64(resBodyMap["expired_at"].(float64))
 	log.Printf("User: %s sign in success\n", user.LoginName)
 	return err
 }
