@@ -27,20 +27,20 @@ func NewUser(loginName string, password string) (*User, error) {
 
 func (user *User) SignUp() error {
 	res, err := api.UserSignUp(user.LoginName, user.Password)
-	defer res.Body.Close()
 	if err != nil {
 		return api.BaseAPIRespErrorHandle(res, err)
 	}
+	defer res.Body.Close()
 	log.Printf("User: %s sign up success\n", user.LoginName)
 	return err
 }
 
 func (user *User) SignIn() error {
 	res, err := api.UserSignIn(user.LoginName, user.Password)
-	defer res.Body.Close()
 	if err != nil {
 		return api.BaseAPIRespErrorHandle(res, err)
 	}
+	defer res.Body.Close()
 	resBodyMap, _ := res.ParseBodyToMap()
 	user.authToken = resBodyMap["token"].(string)
 	user.expiredAt = int64(resBodyMap["expired_at"].(float64))
