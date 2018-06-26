@@ -13,6 +13,14 @@ func UserSignUp(loginName string, password string) (*Response, error) {
 	return res, err
 }
 
+func UserSignIn(loginName string, password string) (*Response, error) {
+	res, err := Post(config.Config.ApiUrl+"/v1/users/signin", map[string]interface{}{
+		"login_name": loginName,
+		"password":   password,
+	})
+	return res, err
+}
+
 func GetBestUsers(page int64, pageSize int64) (*Response, error) {
 	pageStr := strconv.FormatInt(page, 2)
 	pageSizeStr := strconv.FormatInt(pageSize, 10)

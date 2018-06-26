@@ -3,7 +3,9 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 	urlpkg "net/url"
 )
@@ -11,7 +13,7 @@ import (
 type Response http.Response
 
 func (resp *Response) ParseBodyToMap() (map[string]interface{}, error) {
-	var resBody map[string]interface{}
+	resBody := map[string]interface{}{} //= make(map[string]interface{}) //2选1
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(&resBody); err != nil {
 		return nil, err
@@ -34,6 +36,9 @@ func Post(url string, body map[string]interface{}) (*Response, error) {
 		return nil, err
 	}
 	resp := Response(*result)
+	if resp.StatusCode != 200 {
+		err = errors.New("StatusNotOK")
+	}
 	return &resp, err
 }
 
@@ -52,5 +57,16 @@ func Get(url string, query map[string]string) (*Response, error) {
 		return nil, err
 	}
 	resp := Response(*result)
+	if resp.StatusCode != 200 {
+		err = errors.New("StatusNotOK")
+	}
 	return &resp, err
+}
+
+func BaseAPIRespErrorHandle(res *Response, err error) error {
+	if err.Error() == "StatusNotOK" {
+		resBodyJson, _ := res.ParseBodyToJSON()
+		log.Printf("Request Error Response: code: %d, body: %v\n", res.StatusCode, string(resBodyJson))
+	}
+	return err
 }
