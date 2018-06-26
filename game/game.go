@@ -28,4 +28,14 @@ func OnePlayerBegin(playerName string) {
 		log.Fatalln(err)
 	}
 	log.Println("success, user: ", user)
+	hangmanCount := config.Config.HangmanCount
+	wg := sync.WaitGroup{}
+	wg.Add(hangmanCount)
+	for i := 0; i < hangmanCount; i++ {
+		go func() {
+			model.UserNewHangman(user)
+			wg.Done()
+		}()
+	}
+	wg.Wait()
 }
