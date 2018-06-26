@@ -6,27 +6,28 @@ import (
 )
 
 type User struct {
-	LoginInfo LoginInfo
+	LoginName string
+	Password  string
 	authToken string
+	expiredAt int64
 }
 
-type LoginInfo struct {
-	LoginName string `json:"login_name"`
-	Password  string `json:"password"`
-}
-
-func NewUser(loginName string, password string) *User {
+func NewUser(loginName string, password string) (*User, error) {
 	user := new(User)
-	user.LoginInfo.LoginName = loginName
-	user.LoginInfo.Password = password
-	return user
+	user.LoginName = loginName
+	user.Password = password
+	if err := user.SignUp(); err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func (user *User) SignUp() error {
-	res, err := api.UserSignUp("test1111", "12")
+	res, err := api.UserSignUp(user.LoginName, user.Password)
 	resBodyJson, err := res.ParseBodyToJSON()
 	defer res.Body.Close()
 	log.Printf("Request Response: code: %d, body: %v\n", res.StatusCode, string(resBodyJson))
+	log.Printf("User: %s sign up success\n", user.LoginName)
 	return err
 }
 
