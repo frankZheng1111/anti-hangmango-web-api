@@ -19,10 +19,6 @@ type JSONConfig struct {
 	Hangman      Hangman
 }
 
-type Server struct {
-	Port int
-}
-
 type Hangman struct {
 	Hp             int
 	Dictionary     []string
