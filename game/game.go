@@ -33,7 +33,9 @@ func OnePlayerBegin(playerName string) {
 	wg.Add(hangmanCount)
 	for i := 0; i < hangmanCount; i++ {
 		go func() {
-			model.UserNewHangman(user)
+			if user.IsUserAuth() {
+				model.UserNewHangman(user)
+			}
 			wg.Done()
 		}()
 	}

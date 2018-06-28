@@ -3,6 +3,7 @@ package model
 import (
 	"anti-hangmango-web-api/api"
 	"log"
+	"time"
 )
 
 type User struct {
@@ -46,6 +47,16 @@ func (user *User) SignIn() error {
 	user.ExpiredAt = int64(resBodyMap["expired_at"].(float64))
 	log.Printf("User: %s sign in success\n", user.LoginName)
 	return err
+}
+
+func (user *User) IsUserAuth() bool {
+	if user.AuthToken == "" || user.ExpiredAt == 0 {
+		return false
+	}
+	if user.ExpiredAt <= time.Now().Unix() {
+		return false
+	}
+	return true
 }
 
 func BestUsers(page int64, pageSize int64) error {
