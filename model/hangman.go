@@ -27,7 +27,7 @@ func UserNewHangman(user *User) (*Hangman, error) {
 	hangman.Hp = int8(resBodyMap["hp"].(float64))
 	hangman.Word = resBodyMap["word"].(string)
 	hangman.InitDictionary()
-	log.Println("New Hangman success: ", hangman)
+	log.Printf("New Hangman success: Id: %d, Word: %s\n", hangman.Id, hangman.Word)
 	return hangman, nil
 }
 
@@ -90,7 +90,7 @@ func (hangman *Hangman) GuessNextLetter(user *User) error {
 	hangman.Hp = int8(resBodyMap["hp"].(float64))
 	hangman.Word = resBodyMap["word"].(string)
 	hangman.UpdateRemainLetter(guessLetter)
-	log.Println("Hangman Guess guessLetter: ", guessLetter)
+	log.Printf("Hangman Guess Letter Id: %d, Word: %s, Letter: %s, Hp: %d\n", hangman.Id, hangman.Word, guessLetter, hangman.Hp)
 	return nil
 }
 
