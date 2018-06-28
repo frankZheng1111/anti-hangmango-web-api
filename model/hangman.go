@@ -63,11 +63,14 @@ func (hangman *Hangman) UpdateRemainLetter(letter string) {
 			correctPositions[index] = struct{}{}
 		}
 	}
-	for index, wordRunes := range hangman.Dictionary {
+	// for index, wordRunes := range hangman.Dictionary {
+	for index := 0; index < len(hangman.Dictionary); index++ {
+		wordRunes := hangman.Dictionary[index]
 		if len(correctPositions) > 0 { // 若该字母猜对了, 留下仅该位置正确的词
 			for letterIndex, wordRune := range wordRunes {
 				if _, ok := correctPositions[letterIndex]; ok && (wordRune != letterRune) || (!ok && wordRune == letterRune) {
 					hangman.RemoveWordInDictionary(index)
+					index--
 				} else {
 					hangman.UpdateLettersCount(wordRunes)
 				}
@@ -76,6 +79,7 @@ func (hangman *Hangman) UpdateRemainLetter(letter string) {
 			hangman.UpdateLettersCount(wordRunes)
 		} else {
 			hangman.RemoveWordInDictionary(index)
+			index--
 		}
 	}
 }
