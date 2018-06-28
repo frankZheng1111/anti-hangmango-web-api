@@ -12,6 +12,7 @@ type Hangman struct {
 	Hp            int8
 	Word          string
 	StaticLetters []map[rune]int
+	LettersCount  map[rune]int
 }
 
 func UserNewHangman(user *User) (*Hangman, error) {
@@ -31,10 +32,12 @@ func UserNewHangman(user *User) (*Hangman, error) {
 }
 
 func (hangman *Hangman) InitDictionary() {
+	const POSSIBLE_LETTER_COUNT = 36
 	wordLen := len([]rune(hangman.Word))
 	hangman.StaticLetters = make([]map[rune]int, wordLen)
+	hangman.LettersCount = make(map[rune]int, POSSIBLE_LETTER_COUNT)
 	for i := 0; i < wordLen; i++ {
-		hangman.StaticLetters[i] = make(map[rune]int, 36)
+		hangman.StaticLetters[i] = make(map[rune]int, POSSIBLE_LETTER_COUNT)
 	}
 	for _, word := range config.Config.Hangman.Dictionary {
 		letterRunes := []rune(word)
@@ -43,8 +46,52 @@ func (hangman *Hangman) InitDictionary() {
 		}
 		for index, letterRune := range letterRunes {
 			hangman.StaticLetters[index][letterRune]++
+			hangman.LettersCount[letterRune]++
 		}
 	}
+}
+
+func (hangman *Hangman) UpdateRemainLetter(letter string) {
+	letterRune := []rune(letter)[0]
+	correctPositions := []int{}
+	for index, wordLetter := range hangman.Word {
+		if letterRune == wordLetter {
+			correctPositions = append(correctPositions, index)
+		}
+	}
+	for _, correctPosition := range correctPositions {
+		for colLetterRune, count := range hangman.StaticLetters[correctPosition] {
+			hangman.LettersCount[colLetterRune] -= count
+		}
+	}
+	hangman.LettersCount[letterRune] = 0
+}
+
+func (hangman *Hangman) MostInStaticLetters() string {
+	var mostLetter rune
+	for letter, count := range hangman.LettersCount {
+		if mostLetter == 0 {
+			mostLetter = letter
+		} else if count > hangman.LettersCount[mostLetter] {
+			mostLetter = letter
+		}
+	}
+	return string(mostLetter)
+}
+
+func (hangman *Hangman) GuessNextLetter(user *User) error {
+	guessLetter := hangman.MostInStaticLetters()
+	res, err := api.HangmanGuessALetter(user.AuthToken, hangman.Id, hangman.MostInStaticLetters())
+	if err != nil {
+		return api.BaseAPIRespErrorHandle(res, err)
+	}
+	defer res.Body.Close()
+	resBodyMap, _ := res.ParseBodyToMap()
+	hangman.Hp = int8(resBodyMap["hp"].(float64))
+	hangman.Word = resBodyMap["word"].(string)
+	hangman.UpdateRemainLetter(guessLetter)
+	log.Println("Hangman Guess guessLetter: ", guessLetter)
+	return nil
 }
 
 func (hangman *Hangman) IsWin() bool {

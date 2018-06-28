@@ -33,8 +33,15 @@ func OnePlayerBegin(playerName string) {
 	wg.Add(hangmanCount)
 	for i := 0; i < hangmanCount; i++ {
 		go func() {
-			if user.IsUserAuth() {
-				model.UserNewHangman(user)
+			if hangman, err := model.UserNewHangman(user); err == nil {
+				for !hangman.IsFinish() {
+					if err = hangman.GuessNextLetter(user); err != nil {
+						log.Println(err)
+						break
+					}
+				}
+			} else {
+				log.Println(err)
 			}
 			wg.Done()
 		}()
