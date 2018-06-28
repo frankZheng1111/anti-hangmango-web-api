@@ -4,6 +4,7 @@ import (
 	"anti-hangmango-web-api/api"
 	"anti-hangmango-web-api/config"
 	"log"
+	"strings"
 )
 
 type Hangman struct {
@@ -33,7 +34,7 @@ func (hangman *Hangman) InitDictionary() {
 	wordLen := len([]rune(hangman.Word))
 	hangman.StaticLetters = make([]map[rune]int, wordLen)
 	for i := 0; i < wordLen; i++ {
-		hangman.StaticLetters[i] = make(map[rune]int, 26)
+		hangman.StaticLetters[i] = make(map[rune]int, 36)
 	}
 	for _, word := range config.Config.Hangman.Dictionary {
 		letterRunes := []rune(word)
@@ -44,4 +45,12 @@ func (hangman *Hangman) InitDictionary() {
 			hangman.StaticLetters[index][letterRune]++
 		}
 	}
+}
+
+func (hangman *Hangman) IsWin() bool {
+	return !strings.Contains(hangman.Word, "*")
+}
+
+func (hangman *Hangman) IsFinish() bool {
+	return hangman.IsWin() || hangman.Hp == 0
 }

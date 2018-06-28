@@ -12,6 +12,8 @@ import (
 
 type Response http.Response
 
+var client *http.Client = &http.Client{}
+
 func (resp *Response) ParseBodyToMap() (map[string]interface{}, error) {
 	resBody := map[string]interface{}{} //= make(map[string]interface{}) //2选1
 	decoder := json.NewDecoder(resp.Body)
@@ -31,7 +33,6 @@ func Post(url string, header map[string]string, body map[string]interface{}) (*R
 	if err != nil {
 		return nil, err
 	}
-	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, bytes.NewReader(reqBody))
 	req.Header.Add("Content-Type", "application/json;charset=utf-8")
 	for key, value := range header {
@@ -58,7 +59,6 @@ func Get(url string, header map[string]string, query map[string]string) (*Respon
 		ParsedQuery.Add(key, value)
 	}
 	parsedUrl.RawQuery = ParsedQuery.Encode()
-	client := &http.Client{}
 	req, err := http.NewRequest("GET", parsedUrl.String(), nil)
 	for key, value := range header {
 		req.Header.Add(key, value)
