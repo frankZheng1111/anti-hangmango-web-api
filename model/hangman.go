@@ -7,12 +7,14 @@ import (
 	"strings"
 )
 
+const POSSIBLE_LETTER_COUNT = 26
+
 type Hangman struct {
-	Id            int64
-	Hp            int8
-	Word          string
-	StaticLetters []map[rune]int
-	LettersCount  map[rune]int
+	Id           int64
+	Hp           int8
+	Word         string
+	LettersCount map[rune]int
+	Dictionary   [][]rune
 }
 
 func UserNewHangman(user *User) (*Hangman, error) {
@@ -32,39 +34,54 @@ func UserNewHangman(user *User) (*Hangman, error) {
 }
 
 func (hangman *Hangman) InitDictionary() {
-	const POSSIBLE_LETTER_COUNT = 36
 	wordLen := len([]rune(hangman.Word))
-	hangman.StaticLetters = make([]map[rune]int, wordLen)
 	hangman.LettersCount = make(map[rune]int, POSSIBLE_LETTER_COUNT)
-	for i := 0; i < wordLen; i++ {
-		hangman.StaticLetters[i] = make(map[rune]int, POSSIBLE_LETTER_COUNT)
-	}
 	for _, word := range config.Config.Hangman.Dictionary {
 		letterRunes := []rune(word)
 		if wordLen != len(letterRunes) {
 			continue
 		}
-		for index, letterRune := range letterRunes {
-			hangman.StaticLetters[index][letterRune]++
+		hangman.Dictionary = append(hangman.Dictionary, letterRunes)
+		hangman.UpdateLettersCount(letterRunes)
+	}
+}
+
+func (hangman *Hangman) UpdateLettersCount(letterRunes []rune) {
+	for _, letterRune := range letterRunes {
+		if string(letterRune) != "-" {
 			hangman.LettersCount[letterRune]++
 		}
 	}
 }
 
 func (hangman *Hangman) UpdateRemainLetter(letter string) {
+	hangman.LettersCount = make(map[rune]int, POSSIBLE_LETTER_COUNT)
 	letterRune := []rune(letter)[0]
-	correctPositions := []int{}
+	correctPositions := make(map[int]struct{})
 	for index, wordLetter := range hangman.Word {
 		if letterRune == wordLetter {
-			correctPositions = append(correctPositions, index)
+			correctPositions[index] = struct{}{}
 		}
 	}
-	for _, correctPosition := range correctPositions {
-		for colLetterRune, count := range hangman.StaticLetters[correctPosition] {
-			hangman.LettersCount[colLetterRune] -= count
+	for index, wordRunes := range hangman.Dictionary {
+		if len(correctPositions) > 0 { // 若该字母猜对了, 留下仅该位置正确的词
+			for letterIndex, wordRune := range wordRunes {
+				if _, ok := correctPositions[letterIndex]; ok && (wordRune != letterRune) || (!ok && wordRune == letterRune) {
+					hangman.RemoveWordInDictionary(index)
+				} else {
+					hangman.UpdateLettersCount(wordRunes)
+				}
+			}
+		} else if !strings.Contains(string(wordRunes), letter) { // 若该字母猜错了, 留下不包含该字母的词
+			hangman.UpdateLettersCount(wordRunes)
+		} else {
+			hangman.RemoveWordInDictionary(index)
 		}
 	}
-	hangman.LettersCount[letterRune] = 0
+}
+
+func (hangman *Hangman) RemoveWordInDictionary(index int) {
+	hangman.Dictionary = append(hangman.Dictionary[0:index], hangman.Dictionary[index+1:]...)[:len(hangman.Dictionary)-1]
 }
 
 func (hangman *Hangman) MostInStaticLetters() string {

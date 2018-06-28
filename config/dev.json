@@ -1,6 +1,6 @@
 {
-  "userCount": 1,
-  "hangmanCount": 1,
+  "userCount": 10,
+  "hangmanCount": 10,
   "apiUrl": "http://127.0.0.1:3000",
   "hangman": {
     "dictionaryName": "dictionary.txt"
