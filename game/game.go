@@ -33,18 +33,22 @@ func OnePlayerBegin(playerName string) {
 	wg.Add(hangmanCount)
 	for i := 0; i < hangmanCount; i++ {
 		go func() {
-			if hangman, err := model.UserNewHangman(user); err == nil {
-				for !hangman.IsFinish() {
-					if err = hangman.GuessNextLetter(user); err != nil {
-						log.Println(err)
-						break
-					}
-				}
-			} else {
-				log.Println(err)
-			}
+			PlayOneHangman(user)
 			wg.Done()
 		}()
 	}
 	wg.Wait()
+}
+
+func PlayOneHangman(user *model.User) {
+	if hangman, err := model.UserNewHangman(user); err == nil {
+		for !hangman.IsFinish() {
+			if err = hangman.GuessNextLetter(user); err != nil {
+				log.Println(err)
+				break
+			}
+		}
+	} else {
+		log.Println(err)
+	}
 }
